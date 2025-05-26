@@ -12,7 +12,6 @@ public static class DependencyInjector
     {
         MySqlServerVersion serverVersion = new(new Version(8, 0, 34));
         string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
-        Console.WriteLine(connectionString);
 
         services.AddDbContext<EcommerceContext>(
             dbContextOptions => dbContextOptions
