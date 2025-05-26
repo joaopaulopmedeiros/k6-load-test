@@ -2,6 +2,7 @@
 This repository addresses a proof of concept about load test in a docker environment.
 
 ## Local Setup
+Use the following `make` commands:
 ```
 =============================
 Available commands:
