@@ -1,21 +1,21 @@
 version: '3.4'
 
 services:
-  ecommerce-mysqldb:
-    image: mysql:8.0.34
+  ecommerce-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
+    container_name: ecommerce-elasticsearch
     environment:
-      - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=ecommerce
+      - discovery.type=single-node
+      - xpack.security.enabled=false 
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
-      - 3306:3306
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ./config/mysql:/docker-entrypoint-initdb.d
+      - "9200:9200"
     networks:
       - ecommerce-network
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
 
   ecommerce-api:
-    image: ecommerce-api
     build:
       context: .
       dockerfile: src/Ecommerce.Api/Dockerfile
@@ -32,12 +32,11 @@ services:
           memory: 50M        
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - DBHOST=ecommerce-mysqldb
-      - DB_CONNECTION=server=ecommerce-mysqldb;user=root;password=1234;database=ecommerce
+      - ES_CONNECTION=http://ecommerce-elasticsearch:9200
     networks:
       - ecommerce-network
     depends_on:
-      - ecommerce-mysqldb
+      - ecommerce-elasticsearch
 
   ecommerce-nginx:
     image: nginx:alpine
@@ -94,6 +93,7 @@ services:
 
 networks:
   ecommerce-network:
+    driver: bridge
 
 volumes:
-  mysql-data:
+  esdata:
