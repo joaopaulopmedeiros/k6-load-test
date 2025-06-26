@@ -16,7 +16,7 @@ public class EsBulkInsertProductService(ElasticsearchClient client) : IBulkInser
             UpdatedAt = null
         }).ToList();
 
-        var bulkRequest = new BulkRequest(ProductIndex.Name)
+        BulkRequest bulkRequest = new(ProductIndex.Name)
         {
             Operations = new List<IBulkOperation>()
         };
@@ -26,7 +26,7 @@ public class EsBulkInsertProductService(ElasticsearchClient client) : IBulkInser
             bulkRequest.Operations.Add(new BulkIndexOperation<Product>(product));
         }
 
-        var response = await client.BulkAsync(bulkRequest);
+        BulkResponse response = await client.BulkAsync(bulkRequest);
 
         if (!response.IsValidResponse)
         {

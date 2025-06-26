@@ -4,13 +4,13 @@ public class EsSearchProductService(ElasticsearchClient client) : ISearchProduct
 {
     public async Task<IEnumerable<Product>> SearchAsync(SearchProductRequest request)
     {
-        var response = await client.SearchAsync<Product>(s => s
+        SearchResponse<Product> response = await client.SearchAsync<Product>(s => s
             .Indices(ProductIndex.Name)
             .From((request.Page - 1) * request.Size)
             .Size(request.Size)
             .Query(q => q.Bool(b =>
             {
-                var mustQueries = new List<Query>();
+                List<Query> mustQueries = [];
 
                 if (!string.IsNullOrWhiteSpace(request.Title))
                 {
@@ -27,5 +27,4 @@ public class EsSearchProductService(ElasticsearchClient client) : ISearchProduct
 
         return response.Documents;
     }
-
 }
