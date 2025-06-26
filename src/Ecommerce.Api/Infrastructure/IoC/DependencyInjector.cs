@@ -1,5 +1,3 @@
-using Elastic.Clients.Elasticsearch;
-
 namespace Ecommerce.Api.Infrastructure.IoC;
 
 public static class DependencyInjector
@@ -8,10 +6,12 @@ public static class DependencyInjector
     {
         services.AddSingleton(s =>
         {
-            var configuration = s.GetRequiredService<IConfiguration>();
+            IConfiguration configuration = s.GetRequiredService<IConfiguration>();
 
-            var settings = new ElasticsearchClientSettings(new Uri(configuration["ES_CONNECTION"]!))
-                .DefaultIndex("products")
+            Uri uri = new(configuration["ES_CONNECTION"]!);
+
+            ElasticsearchClientSettings settings = new ElasticsearchClientSettings(uri)
+                .DefaultIndex(ProductIndex.Name)
                 .EnableDebugMode();
 
             return new ElasticsearchClient(settings);
@@ -19,7 +19,7 @@ public static class DependencyInjector
 
         services.AddSingleton<ISearchProductService, EsSearchProductService>();
 
-        services.AddSingleton<IAddProductService, EsAddProductService>();
+        services.AddSingleton<IBulkInsertProductService, EsBulkInsertProductService>();
 
         return services;
     }

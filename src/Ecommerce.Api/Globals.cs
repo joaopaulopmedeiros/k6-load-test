@@ -2,4 +2,8 @@
 global using Ecommerce.Api.Requests;
 global using Ecommerce.Api.Services;
 global using Ecommerce.Api.Models;
+global using Ecommerce.Api.Constants;
+global using Elastic.Clients.Elasticsearch;
+global using Elastic.Clients.Elasticsearch.Core.Bulk;
+global using Elastic.Clients.Elasticsearch.QueryDsl;
 global using Microsoft.AspNetCore.Mvc;

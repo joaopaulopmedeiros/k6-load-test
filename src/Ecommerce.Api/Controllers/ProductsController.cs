@@ -18,11 +18,11 @@ public class ProductsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> InsertAsync
     (
-        [FromBody] Product product,
-        [FromServices] IAddProductService service
+        [FromBody] BulkInsertProductRequest request,
+        [FromServices] IBulkInsertProductService service
     )
     {
-        await service.AddAsync(product);
+        await service.BulkInsertAsync(request.Quantity);
         return Created();
     }
 }

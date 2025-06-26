@@ -1,22 +1,11 @@
-using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.QueryDsl;
-
 namespace Ecommerce.Api.Services;
 
-public class EsSearchProductService : ISearchProductService
+public class EsSearchProductService(ElasticsearchClient client) : ISearchProductService
 {
-    private readonly ElasticsearchClient _client;
-    private const string IndexName = "products";
-
-    public EsSearchProductService(ElasticsearchClient client)
-    {
-        _client = client;
-    }
-
     public async Task<IEnumerable<Product>> SearchAsync(SearchProductRequest request)
     {
-        var response = await _client.SearchAsync<Product>(s => s
-            .Indices("products")
+        var response = await client.SearchAsync<Product>(s => s
+            .Indices(ProductIndex.Name)
             .From((request.Page - 1) * request.Size)
             .Size(request.Size)
             .Query(q => q.Bool(b =>
