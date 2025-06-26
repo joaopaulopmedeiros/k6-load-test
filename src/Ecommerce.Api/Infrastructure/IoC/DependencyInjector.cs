@@ -1,29 +1,25 @@
+using Elastic.Clients.Elasticsearch;
+
 namespace Ecommerce.Api.Infrastructure.IoC;
 
 public static class DependencyInjector
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
-        services.AddScoped<ISearchProductService, SearchProductService>();
-        return services;
-    }
+        services.AddSingleton(s =>
+        {
+            var configuration = s.GetRequiredService<IConfiguration>();
 
-    public static IServiceCollection AddMySqlDatabase(this IServiceCollection services)
-    {
-        MySqlServerVersion serverVersion = new(new Version(8, 0, 34));
-        string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+            var settings = new ElasticsearchClientSettings(new Uri(configuration["ES_CONNECTION"]!))
+                .DefaultIndex("products")
+                .EnableDebugMode();
 
-        services.AddDbContext<EcommerceContext>(
-            dbContextOptions => dbContextOptions
-                .UseMySql(connectionString, serverVersion)
-                .LogTo(Console.WriteLine, LogLevel.Information)
-                .EnableSensitiveDataLogging()
-                .EnableDetailedErrors()
-        );
+            return new ElasticsearchClient(settings);
+        });
 
-        services
-            .AddHealthChecks()
-            .AddDbContextCheck<EcommerceContext>();
+        services.AddSingleton<ISearchProductService, EsSearchProductService>();
+
+        services.AddSingleton<IAddProductService, EsAddProductService>();
 
         return services;
     }

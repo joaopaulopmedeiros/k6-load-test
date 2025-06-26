@@ -4,7 +4,6 @@ namespace Ecommerce.Api.Controllers;
 [Route("[controller]")]
 public class ProductsController : ControllerBase
 {
-
     [HttpGet]
     public async Task<IActionResult> SearchAsync
     (
@@ -14,5 +13,16 @@ public class ProductsController : ControllerBase
     {
         IEnumerable<Product> products = await service.SearchAsync(request);
         return products is null || !products.Any() ? NoContent() : Ok(products);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> InsertAsync
+    (
+        [FromBody] Product product,
+        [FromServices] IAddProductService service
+    )
+    {
+        await service.AddAsync(product);
+        return Created();
     }
 }

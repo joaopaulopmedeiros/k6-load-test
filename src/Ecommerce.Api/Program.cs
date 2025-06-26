@@ -1,9 +1,9 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddMySqlDatabase();
 builder.Services.AddApiServices();
 
 var app = builder.Build();
