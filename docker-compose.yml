@@ -33,6 +33,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ES_CONNECTION=http://ecommerce-elasticsearch:9200
+      - REDIS_CONNECTION=localhost:6379
     networks:
       - ecommerce-network
     depends_on:

@@ -1,12 +1,12 @@
 COMPOSE_FILE=./docker-compose.yml
 
-.PHONY: up loadtest down
+.PHONY: up load down
 
 up:
 	@echo "Starting Docker Compose..."
 	docker compose -f $(COMPOSE_FILE) up -d
 
-loadtest:
+load:
 	@echo "Verifying API's health check..."
 	@while true; do \
 		content=$$(curl -sSf http://localhost:3333/health || true); \
