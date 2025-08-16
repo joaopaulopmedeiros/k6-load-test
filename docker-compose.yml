@@ -91,6 +91,13 @@ services:
     depends_on:
       - ecommerce-grafana
 
+  ecommerce-redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - ecommerce-network
+
 networks:
   ecommerce-network:
     driver: bridge

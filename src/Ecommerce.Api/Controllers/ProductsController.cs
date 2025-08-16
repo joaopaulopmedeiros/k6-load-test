@@ -5,6 +5,8 @@ namespace Ecommerce.Api.Controllers;
 public class ProductsController : ControllerBase
 {
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<Product>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> SearchAsync
     (
         [FromQuery] SearchProductRequest request,
