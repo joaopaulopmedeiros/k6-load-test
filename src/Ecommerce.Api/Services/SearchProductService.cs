@@ -7,22 +7,39 @@ public class SearchProductService(ElasticsearchClient client, IDistributedCache 
 {
     public async Task<IEnumerable<Product>> SearchAsync(SearchProductRequest request)
     {
-        string cacheKey = $"products:{request.Title}:{request.Page}:{request.Size}";
+        string cacheKey = GenerateCacheKey(request);
 
+        IEnumerable<Product>? cachedProducts = await GetFromCacheAsync(cacheKey);
+
+        if (cachedProducts is not null) return cachedProducts;
+
+        var products = await SearchProductsAsync(request);
+
+        if (products.Any()) await SetCacheAsync(cacheKey, products);
+
+        return products;
+    }
+
+    private static string GenerateCacheKey(SearchProductRequest request) =>
+        $"products:{request.Title}:{request.Page}:{request.Size}";
+
+    private async Task<IEnumerable<Product>?> GetFromCacheAsync(string cacheKey)
+    {
         string? cached = await cache.GetStringAsync(cacheKey);
+        return string.IsNullOrEmpty(cached)
+            ? null
+            : JsonSerializer.Deserialize<IEnumerable<Product>>(cached);
+    }
 
-        if (!string.IsNullOrEmpty(cached))
-        {
-            return JsonSerializer.Deserialize<IEnumerable<Product>>(cached) ?? [];
-        }
-
-        SearchResponse<Product> response = await client.SearchAsync<Product>(s => s
+    private async Task<IEnumerable<Product>> SearchProductsAsync(SearchProductRequest request)
+    {
+        var response = await client.SearchAsync<Product>(s => s
             .Indices(ProductIndex.Name)
             .From((request.Page - 1) * request.Size)
             .Size(request.Size)
             .Query(q => q.Bool(b =>
             {
-                List<Query> mustQueries = [];
+                var mustQueries = new List<Query>();
 
                 if (!string.IsNullOrWhiteSpace(request.Title))
                 {
@@ -37,16 +54,15 @@ public class SearchProductService(ElasticsearchClient client, IDistributedCache 
             }))
         );
 
-        var products = response.Documents;
+        return response.Documents ?? [];
+    }
 
-        if (products != null && products.Count != 0)
+    private async Task SetCacheAsync(string cacheKey, IEnumerable<Product> products)
+    {
+        var options = new DistributedCacheEntryOptions
         {
-            await cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(products), new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-            });
-        }
-
-        return products ?? [];
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        };
+        await cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(products), options);
     }
 }
