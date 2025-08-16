@@ -1,6 +1,6 @@
 namespace Ecommerce.Api.Services;
 
-public class EsSearchProductService(ElasticsearchClient client) : ISearchProductService
+public class SearchProductService(ElasticsearchClient client) : ISearchProductService
 {
     public async Task<IEnumerable<Product>> SearchAsync(SearchProductRequest request)
     {

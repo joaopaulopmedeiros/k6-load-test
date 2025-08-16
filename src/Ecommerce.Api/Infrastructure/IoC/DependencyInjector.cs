@@ -17,9 +17,7 @@ public static class DependencyInjector
             return new ElasticsearchClient(settings);
         });
 
-        services.AddSingleton<ISearchProductService, EsSearchProductService>();
-
-        services.AddSingleton<IBulkInsertProductService, EsBulkInsertProductService>();
+        services.AddSingleton<ISearchProductService, SearchProductService>();
 
         return services;
     }
