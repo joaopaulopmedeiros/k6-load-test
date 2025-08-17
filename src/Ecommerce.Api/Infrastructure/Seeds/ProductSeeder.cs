@@ -4,7 +4,9 @@ public class ProductSeeder(ElasticsearchClient client)
 {
     public async Task SeedAsync(int quantity = 1000)
     {
-        CountResponse countResponse = await client.CountAsync<Product>();
+        CountRequest countRequest = new(ProductIndex.Name);
+
+        CountResponse countResponse = await client.CountAsync(countRequest);
 
         if (countResponse.Count > 0)
         {
