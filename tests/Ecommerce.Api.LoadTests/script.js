@@ -15,7 +15,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://ecommerce-nginx:3333/products?page=1&size=1000&title=product');
+  const res = http.get('http://ecommerce-nginx:3333/products?page=1&size=100&title=product');
   check(res, { 'status was 200': (r) => r.status == 200 });
   sleep(1);
 }

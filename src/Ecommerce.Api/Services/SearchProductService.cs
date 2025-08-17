@@ -1,23 +1,20 @@
-using Microsoft.Extensions.Caching.Distributed;
-
-using System.Text.Json;
 namespace Ecommerce.Api.Services;
 
 public class SearchProductService(ElasticsearchClient client, IDistributedCache cache) : ISearchProductService
 {
-    public async Task<IEnumerable<Product>> SearchAsync(SearchProductRequest request)
+    public async Task<IEnumerable<SearchProductResponse>> SearchAsync(SearchProductRequest request)
     {
         string cacheKey = GenerateCacheKey(request);
 
         IEnumerable<Product>? cachedProducts = await GetFromCacheAsync(cacheKey);
 
-        if (cachedProducts is not null) return cachedProducts;
+        if (cachedProducts is not null) return cachedProducts.Select(p => p.ToResponse());
 
-        var products = await SearchProductsAsync(request);
+        IEnumerable<Product> products = await SearchProductsAsync(request);
 
         if (products.Any()) await SetCacheAsync(cacheKey, products);
 
-        return products;
+        return products.Select(p => p.ToResponse());
     }
 
     private static string GenerateCacheKey(SearchProductRequest request) =>
@@ -33,13 +30,13 @@ public class SearchProductService(ElasticsearchClient client, IDistributedCache 
 
     private async Task<IEnumerable<Product>> SearchProductsAsync(SearchProductRequest request)
     {
-        var response = await client.SearchAsync<Product>(s => s
+        SearchResponse<Product> response = await client.SearchAsync<Product>(s => s
             .Indices(ProductIndex.Name)
             .From((request.Page - 1) * request.Size)
             .Size(request.Size)
             .Query(q => q.Bool(b =>
             {
-                var mustQueries = new List<Query>();
+                List<Query> mustQueries = [];
 
                 if (!string.IsNullOrWhiteSpace(request.Title))
                 {
@@ -59,7 +56,7 @@ public class SearchProductService(ElasticsearchClient client, IDistributedCache 
 
     private async Task SetCacheAsync(string cacheKey, IEnumerable<Product> products)
     {
-        var options = new DistributedCacheEntryOptions
+        DistributedCacheEntryOptions options = new()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
         };

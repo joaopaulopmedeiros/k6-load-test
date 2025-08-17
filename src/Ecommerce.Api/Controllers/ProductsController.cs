@@ -13,7 +13,7 @@ public class ProductsController : ControllerBase
         [FromServices] ISearchProductService service
     )
     {
-        IEnumerable<Product> products = await service.SearchAsync(request);
+        IEnumerable<SearchProductResponse> products = await service.SearchAsync(request);
         return products is null || !products.Any() ? NoContent() : Ok(products);
     }
 }

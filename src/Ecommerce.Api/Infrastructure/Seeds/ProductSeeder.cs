@@ -1,9 +1,18 @@
+namespace Ecommerce.Api.Infrastructure.Seeds;
+
 public class ProductSeeder(ElasticsearchClient client)
 {
     public async Task SeedAsync(int quantity = 1000)
     {
+        CountResponse countResponse = await client.CountAsync<Product>();
+
+        if (countResponse.Count > 0)
+        {
+            return;
+        }
+
         IEnumerable<Product> products = Enumerable.Range(1, quantity)
-            .Select(i => new Product()
+            .Select(i => new Product
             {
                 Id = Guid.NewGuid(),
                 Title = $"Product {i}",
@@ -20,10 +29,7 @@ public class ProductSeeder(ElasticsearchClient client)
             Operations = new List<IBulkOperation>()
         };
 
-        foreach (var product in products)
-        {
-            bulkRequest.Operations.Add(new BulkIndexOperation<Product>(product));
-        }
+        bulkRequest.Operations.AddRange(products.Select(p => new BulkIndexOperation<Product>(p)));
 
         BulkResponse response = await client.BulkAsync(bulkRequest);
 

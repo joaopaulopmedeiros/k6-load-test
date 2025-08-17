@@ -2,5 +2,5 @@
 
 public interface ISearchProductService
 {
-    public Task<IEnumerable<Product>> SearchAsync(SearchProductRequest request);
+    public Task<IEnumerable<SearchProductResponse>> SearchAsync(SearchProductRequest request);
 }
