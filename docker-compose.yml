@@ -12,6 +12,23 @@ services:
       - ecommerce-network
     volumes:
       - esdata:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://ecommerce-elasticsearch:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5    
+        
+  ecommerce-redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ecommerce-api:
     build:
@@ -35,7 +52,10 @@ services:
     networks:
       - ecommerce-network
     depends_on:
-      - ecommerce-elasticsearch
+      ecommerce-elasticsearch:
+        condition: service_healthy
+      ecommerce-redis:
+        condition: service_healthy
 
   ecommerce-nginx:
     image: nginx:1.29.1-alpine
@@ -89,13 +109,6 @@ services:
       - ./tests/Ecommerce.Api.LoadTests:/scripts
     depends_on:
       - ecommerce-grafana
-
-  ecommerce-redis:
-    image: redis:7.2-alpine
-    ports:
-      - "6379:6379"
-    networks:
-      - ecommerce-network
 
 networks:
   ecommerce-network:
