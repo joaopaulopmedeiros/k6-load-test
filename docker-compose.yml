@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   ecommerce-elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
@@ -33,7 +31,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ES_CONNECTION=http://ecommerce-elasticsearch:9200
-      - REDIS_CONNECTION=localhost:6379
+      - REDIS_CONNECTION=ecommerce-redis:6379
     networks:
       - ecommerce-network
     depends_on:
