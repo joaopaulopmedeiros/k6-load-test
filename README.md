@@ -1,5 +1,5 @@
 # K6 Load Test
-This repository addresses a proof of concept about load test in a docker environment for beginners.
+This repository presents a beginner-friendly proof of concept for load testing in a Docker environment.
 
 ## Local Setup
 Use the following `make` commands:
