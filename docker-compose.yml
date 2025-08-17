@@ -38,7 +38,7 @@ services:
       - ecommerce-elasticsearch
 
   ecommerce-nginx:
-    image: nginx:alpine
+    image: nginx:1.29.1-alpine
     volumes:
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -78,7 +78,7 @@ services:
       - ecommerce-influxdb
 
   ecommerce-k6-load-test:
-    image: grafana/k6:latest
+    image: grafana/k6:1.2.1
     networks:
       - ecommerce-network
     ports:
