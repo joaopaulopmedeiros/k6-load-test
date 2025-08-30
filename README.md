@@ -1,5 +1,13 @@
 # K6 Load Test
-This repository presents a beginner-friendly proof of concept for load testing in a Docker environment.
+
+This repository provides a simple proof of concept for load testing an ASP.NET Core Restful API in a fully containerized environment.  
+
+It demonstrates how to define and execute load tests using k6, with metrics stored in InfluxDB and visualized in Grafana.  
+The project helps developers, especially those new to performance testing, to:
+- Simulate realistic traffic and concurrent users against an API.  
+- Measure key performance indicators such as latency, throughput, and error rate.  
+- Monitor system behavior in real-time through Grafana dashboards.  
+- Run reproducible tests in an isolated Docker environment with minimal setup.
 
 ## Local Setup
 Use the following `make` commands:
@@ -8,13 +16,15 @@ Use the following `make` commands:
 Available commands:
 =============================
 down                      Stop containers
-load                      Run load test
 up                        Setup containers
+load                      Run load test
 ```
 
-## Results
-- Load Test Execution: Successfully executed load tests using k6, simulating high traffic scenarios to assess system performance under load;
-- Automated Real-Time Reporting: Integrated Grafana with InfluxDB to provide dynamic, real-time visualization of load test results;
-- Key Metrics Collected: p95 Response Time and other critical performance metrics were gathered to assess the system's efficiency, responsiveness, and stability under varying loads.
+## Contributing
+Contributions are welcome!
+Open issues for bugs, questions, or suggestions.
+Submit pull requests with new test scripts, scenarios, or performance improvements.
 
-<img src="./docs/screenshot-grafana-dashboard.png"/>
+## Results
+While running the load test, you can open grafana at `localhost:3000` to visualize the result such as:
+<img src="./docs/screenshot-grafana-dashboard.png" alt="Grafana Dashboard Screenshot"/>
